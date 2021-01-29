@@ -12,50 +12,12 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: [3.6, 3.7, 3.8]
-        database: [sqlite, mysql, postgresql]
-
-    services:
-      mysql:
-        image: mysql:5
-        env:
-          MYSQL_ROOT_PASSWORD: root
-        ports:
-        - 8877:3306
-        # needed because the container does not provide a healthcheck
-        options: --health-cmd "mysqladmin ping" --health-interval 10s --health-timeout 5s --health-retries=5
-      postgres:
-        image: postgres:10
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: postgres
-        ports:
-        - 8878:5432
-        # needed because the postgres container does not provide a healthcheck
-        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
-
     steps:
     - uses: actions/checkout@v2
-    - name: Set up Python ${{ matrix.python-version }}
+    - name: Set up Python 3.6
       uses: actions/setup-python@v2
       with:
-        python-version: ${{ matrix.python-version }}
+        python-version: 3.6
     - name: Install tox
       run: |
-        pip install tox
-    - name: Toxit
-      run: |
-        tox -e py-${{ matrix.database }} -v
-    
-    - name: coverage xml
-      run: |
-        .tox/py-mysql/bin/coverage xml
-      if: ${{ matrix.python-version == 3.7 && matrix.database == 'mysql' }}
-
-    - uses: codecov/codecov-action@v1
-      with:
-        fail_ci_if_error: true
-      if: ${{ matrix.python-version == 3.7 && matrix.database == 'mysql' }}
+        echo https://github.com/fopina/django-bulk-update-or-create/blob/master/.github/workflows/test.yml
