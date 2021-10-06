@@ -1,6 +1,15 @@
 from pathlib import Path
+import venv as pyvenv
+import random
+import shutil
 
 from . import config as C, db, shell
+
+
+class VenvError(Exception):
+    """
+    errors managing virtualenvs
+    """
 
 
 def bindir(path):
@@ -25,10 +34,10 @@ def list_available():
 
 
 def load(path):
-    print('LOADING', path)
+    print(f'Loading {path}...')
     bd = bindir(path)
     if bd is None:
-        raise Exception('how did you get here??')
+        raise VenvError('how did you get here??')
     l, p = shell.get_shell()
     l(bd, p)
 
@@ -41,13 +50,38 @@ def bind(name, path=None):
     dbi = db.DB()
     path_str = str(path)
     if path_str in dbi:
-        raise Exception(f'{path} is already bound to {path_str}')
+        raise VenvError(f'{path} is already bound to {path_str}')
     dbi[path_str] = name
     dbi.dump()
     return venv_path
 
 
-def for_path(path=None):
+def unbind(path=None):
+    env, ppath = for_path_helper(path)
+    if env is None:
+        raise VenvError(f'{path} is NOT bound to any env')
+    dbi = db.DB()
+    del dbi[str(ppath)]
+    dbi.dump()
+
+
+def new(name=None):
+    if name is None:
+        # generate random one
+        name = f'auto_{int(random.random()*16777215):x}'
+    venv_path = C.VENV_DIR / name
+    pyvenv.create(venv_path)
+    return name
+
+
+def shed(name):
+    venv_path = C.VENV_DIR / name
+    if not venv_path.exists():
+        raise VenvError(f'{name} does not exist')
+    shutil.rmtree(venv_path)
+
+
+def for_path_helper(path=None):
     if path is None:
         path = Path.cwd()
     else:
@@ -56,6 +90,10 @@ def for_path(path=None):
     while path != root:
         r = db.DB().get(str(path))
         if r is not None:
-            return C.VENV_DIR / r
+            return C.VENV_DIR / r, path
         path = path.parent
-    return None
+    return None, path
+
+
+def for_path(path=None):
+    return for_path_helper(path)[0]

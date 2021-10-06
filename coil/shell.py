@@ -1,7 +1,5 @@
-import signal
 import os
 from pathlib import Path
-import subprocess
 
 from . import config as C
 
@@ -18,7 +16,9 @@ def zsh_shell(exe_dir, shell_path):
 
 
 def bash_shell(exe_dir, shell_path):
-    pass
+    """
+    TODO: windows support
+    """
 
 
 def get_shell():
