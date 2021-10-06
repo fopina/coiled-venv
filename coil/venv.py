@@ -1,4 +1,6 @@
 from pathlib import Path
+import venv as pyvenv
+import random
 
 from . import config as C, db, shell
 
@@ -60,6 +62,15 @@ def unbind(path=None):
     dbi = db.DB()
     del dbi[str(ppath)]
     dbi.dump()
+
+
+def new(name=None):
+    if name is None:
+        # generate random one
+        name = f'auto_{int(random.random()*16777215):x}'
+    venv_path = C.VENV_DIR / name
+    pyvenv.create(venv_path)
+    return name
 
 
 def for_path_helper(path=None):

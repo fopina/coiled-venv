@@ -15,6 +15,8 @@ def parseargs(args):
     parser.add_argument('-l', '--list', action='store_true', help='list available venvs')
     parser.add_argument('-b', '--bind', type=str, metavar='ENV', help='bind venv to current path')
     parser.add_argument('-u', '--unbind', action='store_true', help='unbind venv from current path')
+    parser.add_argument('-c', '--create', type=str, metavar='ENV', help='create new venv and bind it to current path')
+    parser.add_argument('-a', '--auto', action='store_true', help='create new venv (random name) and bind it to current path')
     parser.add_argument('--version', action='version', version=__version__)
 
     return parser.parse_args(args)
@@ -27,22 +29,27 @@ def main_wrapped(args=None):
             print(_e)
         return 0
 
+    if args.unbind:
+        venv.unbind()
+        return
+
     if args.bind:
         env = venv.bind(args.bind)
         if env is None:
             print(f'env {args.bind} does not exist. Use -c create it or -l to see the ones available')
             return 1
-        venv.load(env)
-    
-    if args.unbind:
-        venv.unbind()
-        return
+    elif args.create:
+        venv.new(name=args.create)
+        env = venv.bind(args.create)
+    elif args.auto:
+        env_name = venv.new()
+        env = venv.bind(env_name)
+    else:
+        env = venv.for_path()
+        if env is None:
+            print('No env configured for current directory. Use "-b ENV" to bind an existing one or "-c ENV" to create and bind to a new one')
+            return 1
 
-    env = venv.for_path()
-    if env is None:
-        print('No env configured for current directory. Use "-b ENV" to bind an existing one or "-c ENV" to create and bind to a new one')
-        return 1
-    
     venv.load(env)
 
 
