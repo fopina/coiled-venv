@@ -1,6 +1,7 @@
 from pathlib import Path
 import venv as pyvenv
 import random
+import shutil
 
 from . import config as C, db, shell
 
@@ -71,6 +72,13 @@ def new(name=None):
     venv_path = C.VENV_DIR / name
     pyvenv.create(venv_path)
     return name
+
+
+def shed(name):
+    venv_path = C.VENV_DIR / name
+    if not venv_path.exists():
+        raise VenvError(f'{name} does not exist')
+    shutil.rmtree(venv_path)
 
 
 def for_path_helper(path=None):

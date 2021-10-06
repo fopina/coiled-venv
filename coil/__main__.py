@@ -17,6 +17,7 @@ def parseargs(args):
     parser.add_argument('-u', '--unbind', action='store_true', help='unbind venv from current path')
     parser.add_argument('-c', '--create', type=str, metavar='ENV', help='create new venv and bind it to current path')
     parser.add_argument('-a', '--auto', action='store_true', help='create new venv (random name) and bind it to current path')
+    parser.add_argument('-s', '--shed', type=str, nargs='+', help='remove these virtualenvs')
     parser.add_argument('--version', action='version', version=__version__)
 
     return parser.parse_args(args)
@@ -31,6 +32,12 @@ def main_wrapped(args=None):
 
     if args.unbind:
         venv.unbind()
+        return
+
+    if args.shed:
+        for v in args.shed:
+            print(f'Shedding {v}')
+            venv.shed(v)
         return
 
     if args.bind:
