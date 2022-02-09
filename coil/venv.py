@@ -2,6 +2,7 @@ from pathlib import Path
 import venv as pyvenv
 import random
 import shutil
+import subprocess
 
 from . import config as C, db, shell
 
@@ -70,7 +71,7 @@ def new(name=None):
         # generate random one
         name = f'auto_{int(random.random()*16777215):x}'
     venv_path = C.VENV_DIR / name
-    pyvenv.create(venv_path)
+    pyvenv.create(venv_path, with_pip=True)
     return name
 
 
