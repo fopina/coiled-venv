@@ -1,8 +1,10 @@
 from . import __description__, __version__
 import argparse
 import sys
+from collections import defaultdict
+from pathlib import Path
 
-from . import venv
+from . import venv, db
 
 
 def parseargs(args):
@@ -21,6 +23,7 @@ def parseargs(args):
     )
     parser.add_argument('-s', '--shed', type=str, nargs='+', help='remove these virtualenvs')
     parser.add_argument('--fix', action='store_true', help='fix broken python binaries in virtualenv')
+    parser.add_argument('--cleanup', action='store_true', help='shed venvs that are not bound to any path')
     parser.add_argument('--version', action='version', version=__version__)
 
     return parser.parse_args(args)
@@ -29,8 +32,33 @@ def parseargs(args):
 def main_wrapped(args=None):
     args = parseargs(args)
     if args.list:
+        rev_db = defaultdict(set)
+        for k, v in db.DB().items():
+            if Path(k).exists():
+                rev_db[v].add(k)
         for _e in venv.list_available():
-            print(_e)
+            if rev_db.get(_e):
+                print(f'{_e} (used in {", ".join(rev_db[_e])})')
+            else:
+                print(_e)
+        return 0
+
+    if args.cleanup:
+        dbi = db.DB()
+        _keys = list(dbi.keys())
+        for k in _keys:
+            if not Path(k).exists():
+                del dbi[k]
+        dbi.dump()
+
+        rev_db = defaultdict(set)
+        for k, v in dbi.items():
+            if Path(k).exists():
+                rev_db[v].add(k)
+        for _e in venv.list_available():
+            if not rev_db.get(_e):
+                print(f'Shedding {_e}...')
+                venv.shed(_e)
         return 0
 
     if args.unbind:
