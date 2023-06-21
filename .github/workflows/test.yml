@@ -13,11 +13,11 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up Python 3.6
-      uses: actions/setup-python@v2
+    - uses: actions/checkout@v3
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v4
       with:
-        python-version: 3.6
+        python-version: 3.9
     - name: Install tox
       run: |
         echo https://github.com/fopina/django-bulk-update-or-create/blob/master/.github/workflows/test.yml
