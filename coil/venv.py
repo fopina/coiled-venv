@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Optional
 import venv as pyvenv
 import random
 import shutil
@@ -13,7 +14,7 @@ class VenvError(Exception):
     """
 
 
-def bindir(path):
+def bindir(path) -> Optional[Path]:
     d = path / 'bin'
     if d.is_dir():
         return d
@@ -26,6 +27,24 @@ def bindir(path):
 
 def check(path):
     return bindir(path) is not None
+
+
+def fix_broken(name):
+    v = C.VENV_DIR / name
+    bin = bindir(v)
+    try:
+        subprocess.check_output([bin / 'python', '--version'], stderr=subprocess.PIPE)
+        return False
+    except subprocess.CalledProcessError:
+        pass
+
+    for pe in bin.glob('python*'):
+        if pe.is_file():
+            pe.unlink()
+    for pe in bin.glob('pip*'):
+        if pe.is_file():
+            pe.unlink()
+    return new(name=name)
 
 
 def list_available():
