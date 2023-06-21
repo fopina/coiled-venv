@@ -3,14 +3,17 @@ from pathlib import Path
 
 from . import config as C
 
+
 def zsh_shell(exe_dir, shell_path):
     rcfile = exe_dir / '.coil.zsh' / '.zshrc'
     rcfile.parent.mkdir(exist_ok=True)
     with open(rcfile, 'w') as f:
-        f.write(f'''\
+        f.write(
+            f'''\
 . ~/.zshrc
 . {exe_dir / 'activate'}
-''')
+'''
+        )
     os.environ['ZDOTDIR'] = str(rcfile.parent)
     os.execlp(shell_path or 'zsh', '-i')
 

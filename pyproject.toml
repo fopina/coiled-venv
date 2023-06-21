@@ -1,0 +1,68 @@
+[build-system]
+requires = ["setuptools", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "coiled-venv"
+dynamic = ["version"]
+description = "Let it hatch, watch it coil (your python virtualenv)"
+authors = [
+    {name = "Filipe Pina", email = "fopina@skmobi.com"},
+]
+readme = "README.md"
+requires-python = ">=3.7"
+keywords = ["productivity", "virtual env", "cleanup", "cli"]
+license = {text = "MIT"}
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.6",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+]
+
+[project.scripts]
+coil = "coil.__main__:main"
+
+[project.optional-dependencies]
+dev = ["black==23.1.0"]
+
+[tool.setuptools]
+packages = ["coil"]
+
+[tool.setuptools.dynamic]
+version = {attr = "coil.__version__"}
+
+[tool.coverage.run]
+source = ["coil"]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true
+
+[tool.black]
+line-length = 120
+skip-string-normalization = true
+target-version = ['py39']
+include = '\.pyi?$'
+exclude = '''
+/(
+    \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | \.venv3
+  | _build
+  | buck-out
+  | build
+  | dist
+  | migrations
+)/
+'''
