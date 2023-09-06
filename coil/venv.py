@@ -35,7 +35,7 @@ def fix_broken(name):
     try:
         subprocess.check_output([bin / 'python', '--version'], stderr=subprocess.PIPE)
         return False
-    except subprocess.CalledProcessError:
+    except (subprocess.CalledProcessError, FileNotFoundError):
         pass
 
     for pe in bin.glob('python*'):
@@ -90,7 +90,7 @@ def new(name=None):
         # generate random one
         name = f'auto_{int(random.random()*16777215):x}'
     venv_path = C.VENV_DIR / name
-    pyvenv.create(venv_path, with_pip=True)
+    pyvenv.create(venv_path, with_pip=True, symlinks=True)
     return name
 
 
